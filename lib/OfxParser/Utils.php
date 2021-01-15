@@ -88,24 +88,25 @@ class Utils
      */
     public static function createAmountFromStr($amountString)
     {
+        // This assumes that all supported currency will have no more than
+        // 2 decimal places! The tell is the thousands separator, followed
+        // by three digits. If no thousands separator present, the only
+        // differentiator is number of decimal places.
+
         // Decimal mark style (UK/US): 000.00 or 0,000.00
-        if (preg_match('/^(-|\+)?([\d,]+)(\.?)([\d]{2})$/', $amountString) === 1) {
-            return (float)preg_replace(
-                ['/([,]+)/', '/\.?([\d]{2})$/'],
-                ['', '.$1'],
-                $amountString
-            );
+        if (preg_match('/(\d,\d{3}|\.\d{1,2}$)/', $amountString) === 1) {
+            return (float) str_replace(',', '', $amountString);
         }
 
         // European style: 000,00 or 0.000,00
-        if (preg_match('/^(-|\+)?([\d\.]+,?[\d]{2})$/', $amountString) === 1) {
-            return (float)preg_replace(
-                ['/([\.]+)/', '/,?([\d]{2})$/'],
-                ['', '.$1'],
+        if (preg_match('/(\d\.\d{3}|,\d{1,2}$)/', $amountString) === 1) {
+            return (float) str_replace(
+                array('.', ','),
+                array('', '.'),
                 $amountString
             );
         }
 
-        return (float)$amountString;
+        return (float) $amountString;
     }
 }
